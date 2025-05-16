@@ -11,14 +11,14 @@ import { cn } from "../../lib/utils";
 export function SidebarDemo() {
   const { isLogged, logout, username } = useUserDetails();
   const navigate = useNavigate();
-  const [open, setOpen] = useState(true); 
-  const [posts, setPosts] = useState([]); 
+  const [open, setOpen] = useState(true);
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/posts") 
+    fetch("http://localhost:5000/api/posts")
       .then((response) => response.json())
       .then((data) => {
-        setPosts(data);  
+        setPosts(data);
       })
       .catch((error) => console.error("Error fetching posts:", error));
   }, []);
@@ -33,10 +33,6 @@ export function SidebarDemo() {
     setOpen(false);
   };
 
-  const links = [
-    { label: isLogged ? "Logout" : "Login", onClick: isLogged ? handleLogout : () => handleNavigate("/auth"), icon: <IconArrowLeft className="icon" /> }
-  ];
-
   return (
     <div className="flex h-screen w-full overflow-hidden">
       <div className={cn("transition-all duration-300", open ? "w-64" : "w-20")}>
@@ -48,14 +44,15 @@ export function SidebarDemo() {
                 {posts.map((post, idx) => (
                   <SidebarLink
                     key={idx}
-                    link={{ label: post.title, href: "#" }} 
-                    onClick={() => handleNavigate(`/post/${post._id}`)} 
+                    link={{ label: post.title, href: "#" }}
+                    onClick={() => handleNavigate(`/post/${post._id}`)}
                     className="sidebar-link"
                   />
                 ))}
               </div>
             </div>
-            <div className="sidebar-footer">
+
+            <div className="sidebar-footer flex flex-col gap-2">
               <SidebarLink
                 link={{
                   label: isLogged ? username : "User",
@@ -68,6 +65,16 @@ export function SidebarDemo() {
                     />
                   ),
                 }}
+                className="sidebar-link"
+              />
+
+              <SidebarLink
+                link={{
+                  label: isLogged ? "Logout" : "Login",
+                  href: isLogged ? "#" : "/auth",
+                  icon: <IconArrowLeft className="icon" />,
+                }}
+                onClick={isLogged ? handleLogout : () => handleNavigate("/auth")}
                 className="sidebar-link"
               />
             </div>

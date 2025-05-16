@@ -38,6 +38,21 @@ export const register = async (data) => {
     }
 }
 
+export const getPublicacion = async (data) => {
+    try {
+        return await apiClient.post('publicacion/', data)
+    } catch (e) {
+        return { error: true, e }
+    }
+}
+
+export const getCommit = async (data) => {
+    try {
+        return await apiClient.post('commit/', data)
+    } catch (e) {
+        return { error: true, e }
+    }
+}
 const checkResponseStatus = (e) => {
   const responseStatus = e?.response.status;
   if (responseStatus) {

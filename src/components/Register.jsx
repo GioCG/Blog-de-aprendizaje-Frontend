@@ -31,7 +31,7 @@ export const Register = ({ switchAuthHandler }) => {
       <Logo />
       <h1>Register Almacen</h1>
       <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
-      <Input
+        <Input
           field="name"
           label="Name"
           {...register("name")}

@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { loginSchema } from '../shared/validators'; 
 import { useLogin } from '../shared/hooks';
+import toast from "react-hot-toast";
 
 export const Login = ({ switchAuthHandler }) => {
   const { login, isLoading } = useLogin();
@@ -30,23 +31,22 @@ export const Login = ({ switchAuthHandler }) => {
       <Logo />
       <h1>Register Almacen</h1>
       <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
-      <Input
-        field="email"
-        label="Email"
-        {...register("email")}
-        type="text"
-        showErrorMessage={!!errors.email}
-        validationMessage={errors.email?.message}
-      />
-
-      <Input
-        field="password"
-        label="Password"
-        {...register("password")}
-        type="password"
-        showErrorMessage={!!errors.password}
-        validationMessage={errors.password?.message}
-      />
+        <Input
+          field="email"
+          label="Email"
+          {...register("email")}
+          type="text"
+          showErrorMessage={!!errors.email}
+          validationMessage={errors.email?.message}
+        />
+        <Input
+          field="password"
+          label="Password"
+          {...register("password")}
+          type="password"
+          showErrorMessage={!!errors.password}
+          validationMessage={errors.password?.message}
+        />
         <button type="submit" disabled={isLoading || !isValid}>
           Login
         </button>
