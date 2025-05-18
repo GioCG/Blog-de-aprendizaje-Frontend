@@ -1,32 +1,37 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { getPublicacion } from "../../services"; 
+import { getPublicacionesByCategory } from "../../services";
 
-export const useGetPublicacion = (id) => {
-  const [data, setData] = useState(null);
+export const useGetPublicacionesPorCategoria = (categoria) => {
+  const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchPublicacion = async () => {
+  const fetchPublicaciones = async () => {
     setIsLoading(true);
     try {
-      const response = await getPublicacion(id);
-      if (response.error) {
-        toast.error(response.error?.response?.data || "Error al cargar publicación");
+      const response = await getPublicacionesByCategory(categoria);
+      console.log("📥 Datos recibidos:", response);
+
+      if (response?.data?.publications && Array.isArray(response.data.publications)) {
+        setData(response.data.publications); // <- ✅ Esto es lo importante
       } else {
-        setData(response.data);
+        toast.error("No se encontraron publicaciones.");
+        setData([]);
       }
     } catch (error) {
-      toast.error("Error al cargar publicación");
+      toast.error("Error al cargar publicaciones");
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (id) {
-      fetchPublicacion();
+    if (categoria) {
+      console.log("🔍 Buscando publicaciones para:", categoria);
+      fetchPublicaciones();
     }
-  }, [id]);
+  }, [categoria]);
 
-  return { data, isLoading, refetch: fetchPublicacion };
+  return { data, isLoading, refetch: fetchPublicaciones };
 };

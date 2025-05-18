@@ -38,13 +38,24 @@ export const register = async (data) => {
     }
 }
 
-export const getPublicacion = async (data) => {
-    try {
-        return await apiClient.post('publicacion/', data)
-    } catch (e) {
-        return { error: true, e }
-    }
-}
+export const getPublicacionesByCategory = async (categoriaNombre) => {
+  try {
+    console.log(categoriaNombre+" hola")
+    const response = await apiClient.get(`/publicacion/${categoriaNombre}`);
+    return { data: response.data };
+  } catch (error) {
+    return { error };
+  }
+};
+
+export const createCommit = async (data) => {
+  try {
+    const response = await apiClient.post("/commit/", data);
+    return response.data;
+  } catch (error) {
+    return { error: true, message: error.response?.data?.message || "Error al crear commit" };
+  }
+};
 
 export const getCommit = async (data) => {
     try {
