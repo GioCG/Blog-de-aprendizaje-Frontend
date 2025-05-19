@@ -1,19 +1,29 @@
 import React from "react";
-import { useGetCommit } from "../shared/hooks/useGetCommit"; 
+import { useGetCommitsByUsername } from "../shared/hooks";
 
-export const CommitDetail = ({ commitId }) => {
-  const { data, isLoading, refetch } = useGetCommit(commitId);
+export const CommitsList = ({ username }) => {
+  const { commits, isLoading, refetch } = useGetCommitsByUsername(username);
 
-  if (isLoading) return <p>Cargando commit...</p>;
-
-  if (!data) return <p>No se encontró el commit.</p>;
+  if (isLoading) return <p>Cargando commits...</p>;
+  if (!commits.length) return <p>No se encontraron commits para {username}.</p>;
 
   return (
-    <div>
-      <h2>Commit: {data.id}</h2>
-      <p>Mensaje: {data.message}</p>
-      <p>Autor: {data.author}</p>
-      <button onClick={refetch}>Recargar</button>
+    <div className="commits-list-container">
+      <h2 className="commits-list-title">Commits de {username}</h2>
+      <ul className="commits-list-ul">
+        {commits.map((c) => (
+          <li key={c._id} className="commits-list-item">
+            <p><strong>Mensaje:</strong> {c.textoprincipal}</p>
+            <p><strong>Autor:</strong> {c.user.username}</p>
+            <p><strong>Fecha:</strong> {new Date(c.createdAt).toLocaleString()}</p>
+            {c.parentCommit && (
+              <p className="parent-commit">
+                Respuesta a: {c.parentCommit.user.username} — "{c.parentCommit.textoprincipal}"
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

@@ -12,8 +12,19 @@ export const DashboardPage = () => {
         <SidebarDemo />
 
         <div className="dashboard-main">
-          <div className="dashboard-courses">
+          {/* Sección de introducción */}
+          <section className="dashboard-intro">
+            <h1>Bienvenido al Dashboard del Blog</h1>
+            <p>
+              Esta página te permite navegar fácilmente por las diferentes categorías
+              de blogs disponibles: Práctica Supervisada, Taller III y Tecnología III.
+              Haz clic en cualquiera de las tarjetas para explorar las publicaciones
+              correspondientes a esa categoría. ¡Disfruta la lectura y mantente actualizado con las últimas entradas!
+            </p>
+          </section>
 
+          {/* Cursos / Categorías */}
+          <div className="dashboard-courses">
             <Link
               to="/blog/practicasupervisada"
               state={{ categoriaNombre: "practicasupervisada" }}
@@ -40,7 +51,6 @@ export const DashboardPage = () => {
               <img src={tecnologiaImg} alt="tecnologia" />
               <p>Tecnología III</p>
             </Link>
-
           </div>
         </div>
       </div>

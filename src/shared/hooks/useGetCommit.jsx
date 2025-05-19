@@ -1,32 +1,30 @@
-import { useState, useEffect } from "react";
-import toast from "react-hot-toast";
-import { getCommit } from "../../services"; 
 
-export const useGetCommit = (commitId) => {
-  const [data, setData] = useState(null);
+import { useState, useEffect, useCallback } from "react";
+import toast from "react-hot-toast";
+import { getCommitsByUsername } from "../../services/api";
+
+export const useGetCommitsByUsername = (username) => {
+  const [commits, setCommits] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchCommit = async () => {
+  const fetchCommits = useCallback(async () => {
+    if (!username) return;
     setIsLoading(true);
-    try {
-      const response = await getCommit(commitId);
-      if (response.error) {
-        toast.error(response.error?.response?.data || "Error al cargar commit");
-      } else {
-        setData(response.data);
-      }
-    } catch (error) {
-      toast.error("Error al cargar commit");
-    } finally {
-      setIsLoading(false);
+    const { data: resp, error } = await getCommitsByUsername(username);
+    if (error) {
+      const msg = error.response?.data?.message || "Error al cargar commits";
+      toast.error(msg);
+    } else if (!resp.success) {
+      toast.error(resp.message || "No fue posible obtener commits");
+    } else {
+      setCommits(resp.commits);
     }
-  };
+    setIsLoading(false);
+  }, [username]);
 
   useEffect(() => {
-    if (commitId) {
-      fetchCommit();
-    }
-  }, [commitId]);
+    fetchCommits();
+  }, [fetchCommits]);
 
-  return { data, isLoading, refetch: fetchCommit };
+  return { commits, isLoading, refetch: fetchCommits };
 };

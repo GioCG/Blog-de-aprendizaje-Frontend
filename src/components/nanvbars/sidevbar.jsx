@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/img/Logo.png";
 import profile from "../../assets/img/profile.png";
+import practicaImg from "../../assets/img/Práctica Supervisada IN6CM.gif";
+import tallerImg from "../../assets/img/Taller III IN6CM.gif";
+import tecnologiaImg from "../../assets/img/Tecnología III IN6CM.gif";
 import { useUserDetails } from "../../shared/hooks";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 import { IconArrowLeft } from "@tabler/icons-react";
@@ -23,8 +26,8 @@ export function SidebarDemo() {
       .catch((error) => console.error("Error fetching posts:", error));
   }, []);
 
-  const handleNavigate = (path) => {
-    navigate(path);
+    const handleNavigate = (path, options = {}) => {
+    navigate(path, options);
     setOpen(false);
   };
 
@@ -52,11 +55,70 @@ export function SidebarDemo() {
               </div>
             </div>
 
+                <SidebarLink
+                  link={{
+                    label: "Práctica Supervisada",
+                    href: "/blog/practicasupervisada",
+                    icon: (
+                      <img
+                        src={practicaImg}
+                        className="sidebar-avatar"
+                        alt="Práctica Supervisada"
+                      />
+                    ),
+                  }}
+                  onClick={() =>
+                    handleNavigate("/blog/practicasupervisada", {
+                      state: { categoriaNombre: "practicasupervisada" },
+                    })
+                  }
+                  className="sidebar-link"
+                />
+
+                <SidebarLink
+                  link={{
+                    label: "Taller III",
+                    href: "/blog/talleriii",
+                    icon: (
+                      <img
+                        src={tallerImg}
+                        className="sidebar-avatar"
+                        alt="Taller III"
+                      />
+                    ),
+                  }}
+                  onClick={() =>
+                    handleNavigate("/blog/talleriii", {
+                      state: { categoriaNombre: "talleriii" },
+                    })
+                  }
+                  className="sidebar-link"
+                />
+
+                <SidebarLink
+                  link={{
+                    label: "Tecnología III",
+                    href: "/blog/tecnologia",
+                    icon: (
+                      <img
+                        src={tecnologiaImg}
+                        className="sidebar-avatar"
+                        alt="Tecnología III"
+                      />
+                    ),
+                  }}
+                  onClick={() =>
+                    handleNavigate("/blog/tecnologia", {
+                      state: { categoriaNombre: "tecnologia" },
+                    })
+                  }
+                  className="sidebar-link"
+                />
             <div className="sidebar-footer flex flex-col gap-2">
               <SidebarLink
                 link={{
                   label: isLogged ? username : "User",
-                  href: "/settings",
+                  href: "/user",
                   icon: (
                     <img
                       src={profile}

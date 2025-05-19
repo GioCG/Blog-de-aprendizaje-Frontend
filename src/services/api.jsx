@@ -40,7 +40,6 @@ export const register = async (data) => {
 
 export const getPublicacionesByCategory = async (categoriaNombre) => {
   try {
-    console.log(categoriaNombre+" hola")
     const response = await apiClient.get(`/publicacion/${categoriaNombre}`);
     return { data: response.data };
   } catch (error) {
@@ -57,13 +56,14 @@ export const createCommit = async (data) => {
   }
 };
 
-export const getCommit = async (data) => {
+export const getCommitsByUsername = async (username) => {
     try {
-        return await apiClient.post('commit/', data)
-    } catch (e) {
-        return { error: true, e }
-    }
-}
+    const response = await apiClient.get(`/commit/${username}`);
+    return { data: response.data };
+  } catch (error) {
+    return { error };
+  }
+};
 const checkResponseStatus = (e) => {
   const responseStatus = e?.response.status;
   if (responseStatus) {
