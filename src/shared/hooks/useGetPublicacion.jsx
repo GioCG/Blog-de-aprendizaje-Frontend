@@ -13,7 +13,7 @@ export const useGetPublicacionesPorCategoria = (categoria) => {
       console.log("📥 Datos recibidos:", response);
 
       if (response?.data?.publications && Array.isArray(response.data.publications)) {
-        setData(response.data.publications); // <- ✅ Esto es lo importante
+        setData(response.data.publications); // 
       } else {
         toast.error("No se encontraron publicaciones.");
         setData([]);

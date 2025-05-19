@@ -1,72 +1,11 @@
 import React, { useState } from "react";
 import { useGetPublicacionesPorCategoria } from "../shared/hooks/useGetPublicacion";
-import { CrearCommitForm } from "./CraeteCommit"; // corregí el nombre del archivo importado
-
-// Función para convertir lista plana de comentarios a árbol
-const agruparComentarios = (comentarios) => {
-  const mapa = new Map();
-  comentarios.forEach(c => mapa.set(c._id, { ...c, subcommits: [] }));
-
-  const comentariosRaiz = [];
-
-  comentarios.forEach(c => {
-    if (c.parentCommit) {
-      const padre = mapa.get(c.parentCommit);
-      if (padre) padre.subcommits.push(mapa.get(c._id));
-    } else {
-      comentariosRaiz.push(mapa.get(c._id));
-    }
-  });
-
-  return comentariosRaiz;
-};
-
-// Componente recursivo para mostrar un comentario y sus respuestas
-const Comentario = ({ comentario, titulo, setRespuestasActivas, respuestasActivas }) => {
-  return (
-    <li style={{ marginBottom: "10px", marginLeft: comentario.parentCommit ? "20px" : "0" }}>
-      <strong>{comentario.user?.username || "Anónimo"}:</strong> {comentario.textoprincipal}
-
-      <div style={{ marginTop: "4px" }}>
-        <button
-          onClick={() =>
-            setRespuestasActivas((prev) => ({
-              ...prev,
-              [comentario._id]: !prev[comentario._id],
-            }))
-          }
-        >
-          {respuestasActivas[comentario._id] ? "Cancelar respuesta" : "Responder"}
-        </button>
-
-        {respuestasActivas[comentario._id] && (
-          <CrearCommitForm
-            titulo={titulo}
-            parentCommitId={comentario._id}
-          />
-        )}
-      </div>
-
-      {comentario.subcommits && comentario.subcommits.length > 0 && (
-        <ul style={{ marginTop: "8px" }}>
-          {comentario.subcommits.map((sub) => (
-            <Comentario
-              key={sub._id}
-              comentario={sub}
-              titulo={titulo}
-              setRespuestasActivas={setRespuestasActivas}
-              respuestasActivas={respuestasActivas}
-            />
-          ))}
-        </ul>
-      )}
-    </li>
-  );
-};
+import { CrearCommitForm } from "./CraeteCommit";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale"; // Para español
 
 export const PublicacionesPorCategoria = ({ categoria }) => {
   const { data: publicaciones, isLoading, refetch } = useGetPublicacionesPorCategoria(categoria);
-
   const [publicacionActiva, setPublicacionActiva] = useState(null);
   const [respuestasActivas, setRespuestasActivas] = useState({});
 
@@ -79,29 +18,78 @@ export const PublicacionesPorCategoria = ({ categoria }) => {
   return (
     <div>
       <h2>Publicaciones de {categoria.replace("-", " ")}</h2>
-      <button onClick={refetch}>Recargar publicaciones</button>
-
       <div className="publicaciones-list">
         {publicaciones.map((pub) => (
           <div key={pub._id} className="publicacion-card">
             <h3>{pub.titulo}</h3>
             <p>{pub.textoprincipal}</p>
             <p><strong>Autor:</strong> {pub.user?.username || "Desconocido"}</p>
-            <p><strong>Categoría:</strong> {pub.categori}</p>
-            <p><small>Publicado el: {new Date(pub.createdAt).toLocaleDateString()}</small></p>
+            <p>
+              <small>
+                Publicado {formatDistanceToNow(new Date(pub.createdAt), { addSuffix: true, locale: es })}
+              </small>
+            </p>
 
             <div className="comentarios">
               <h4>Comentarios:</h4>
               {pub.commit && pub.commit.length > 0 ? (
-                <ul>
-                  {agruparComentarios(pub.commit).map((comentario) => (
-                    <Comentario
-                      key={comentario._id}
-                      comentario={comentario}
-                      titulo={pub.titulo}
-                      setRespuestasActivas={setRespuestasActivas}
-                      respuestasActivas={respuestasActivas}
-                    />
+                <ul style={{ paddingLeft: 0 }}>
+                  {pub.commit.map((comentario) => (
+                    <li key={comentario._id} style={{ marginBottom: "1rem" }}>
+                      <p>
+                        <strong>{comentario.user?.username}:</strong> {comentario.textoprincipal}
+                        <br />
+                        <small>
+                          {formatDistanceToNow(new Date(comentario.createdAt), { addSuffix: true, locale: es })}
+                        </small>
+                      </p>
+
+                      <button
+                        onClick={() =>
+                          setRespuestasActivas((prev) => ({
+                            ...prev,
+                            [comentario._id]: !prev[comentario._id],
+                          }))
+                        }
+                      >
+                        {respuestasActivas[comentario._id] ? "Cancelar respuesta" : "Responder"}
+                      </button>
+
+                      {respuestasActivas[comentario._id] && (
+                        <CrearCommitForm titulo={pub.titulo} parentCommitId={comentario._id} />
+                      )}
+
+                      {comentario.childCommits && comentario.childCommits.length > 0 && (
+                        <ul className="respuestas" style={{ marginLeft: "1rem", borderLeft: "2px solid #ccc", paddingLeft: "1rem" }}>
+                          {comentario.childCommits.map((respuesta) => (
+                            <li key={respuesta._id} style={{ marginBottom: "0.5rem" }}>
+                              <p>
+                                <strong>{respuesta.user?.username}:</strong> {respuesta.textoprincipal}
+                                <br />
+                                <small>
+                                  {formatDistanceToNow(new Date(respuesta.createdAt), { addSuffix: true, locale: es })}
+                                </small>
+                              </p>
+
+                              <button
+                                onClick={() =>
+                                  setRespuestasActivas((prev) => ({
+                                    ...prev,
+                                    [respuesta._id]: !prev[respuesta._id],
+                                  }))
+                                }
+                              >
+                                {respuestasActivas[respuesta._id] ? "Cancelar respuesta" : "Responder"}
+                              </button>
+
+                              {respuestasActivas[respuesta._id] && (
+                                <CrearCommitForm titulo={pub.titulo} parentCommitId={respuesta._id} />
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
                   ))}
                 </ul>
               ) : (
