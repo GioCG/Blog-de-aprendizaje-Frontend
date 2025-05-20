@@ -2,12 +2,29 @@ import React, { useState } from "react";
 import { useGetPublicacionesPorCategoria } from "../shared/hooks/useGetPublicacion";
 import { CrearCommitForm } from "./CraeteCommit";
 import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale"; // Para español
+import { es } from "date-fns/locale";
+import { useEditCommit } from "../shared/hooks/useEditCommit";
+import { useDeleteCommit } from "../shared/hooks/useDeleteCommit";
 
 export const PublicacionesPorCategoria = ({ categoria }) => {
-  const { data: publicaciones, isLoading, refetch } = useGetPublicacionesPorCategoria(categoria);
+  const { data: publicaciones, isLoading } = useGetPublicacionesPorCategoria(categoria);
   const [publicacionActiva, setPublicacionActiva] = useState(null);
   const [respuestasActivas, setRespuestasActivas] = useState({});
+  const { edit } = useEditCommit();
+  const { remove } = useDeleteCommit();
+
+  const handleEditar = async (id) => {
+    const nuevoTexto = prompt("Editar comentario:");
+    if (nuevoTexto) {
+      await edit({ id, textoprincipal: nuevoTexto });
+    }
+  };
+
+  const handleEliminar = async (id) => {
+    if (confirm("¿Estás seguro de eliminar este comentario?")) {
+      await remove(id);
+    }
+  };
 
   if (isLoading) return <p>Cargando publicaciones...</p>;
 
@@ -44,19 +61,43 @@ export const PublicacionesPorCategoria = ({ categoria }) => {
                         </small>
                       </p>
 
-                      <button
-                        onClick={() =>
-                          setRespuestasActivas((prev) => ({
-                            ...prev,
-                            [comentario._id]: !prev[comentario._id],
-                          }))
-                        }
-                      >
-                        {respuestasActivas[comentario._id] ? "Cancelar respuesta" : "Responder"}
-                      </button>
+                      <div className="flex gap-2 mb-1">
+                        <button
+                          onClick={() =>
+                            setRespuestasActivas((prev) => ({
+                              ...prev,
+                              [comentario._id]: !prev[comentario._id],
+                            }))
+                          }
+                          className="text-blue-500"
+                        >
+                          {respuestasActivas[comentario._id] ? "Cancelar respuesta" : "Responder"}
+                        </button>
+
+                        <button
+                          onClick={() => handleEditar(comentario._id)}
+                          className="text-yellow-600"
+                        >
+                          Editar
+                        </button>
+
+                        <button
+                          onClick={() => handleEliminar(comentario._id)}
+                          className="text-red-600"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
 
                       {respuestasActivas[comentario._id] && (
-                        <CrearCommitForm titulo={pub.titulo} parentCommitId={comentario._id} />
+                        <CrearCommitForm
+                          titulo={pub.titulo}
+                          parentCommitId={comentario._id}
+                          onCancel={() => setRespuestasActivas((prev) => ({
+                            ...prev,
+                            [comentario._id]: false,
+                          }))}
+                        />
                       )}
 
                       {comentario.childCommits && comentario.childCommits.length > 0 && (
@@ -71,19 +112,43 @@ export const PublicacionesPorCategoria = ({ categoria }) => {
                                 </small>
                               </p>
 
-                              <button
-                                onClick={() =>
-                                  setRespuestasActivas((prev) => ({
-                                    ...prev,
-                                    [respuesta._id]: !prev[respuesta._id],
-                                  }))
-                                }
-                              >
-                                {respuestasActivas[respuesta._id] ? "Cancelar respuesta" : "Responder"}
-                              </button>
+                              <div className="flex gap-2 mb-1">
+                                <button
+                                  onClick={() =>
+                                    setRespuestasActivas((prev) => ({
+                                      ...prev,
+                                      [respuesta._id]: !prev[respuesta._id],
+                                    }))
+                                  }
+                                  className="text-blue-500"
+                                >
+                                  {respuestasActivas[respuesta._id] ? "Cancelar respuesta" : "Responder"}
+                                </button>
+
+                                <button
+                                  onClick={() => handleEditar(respuesta._id)}
+                                  className="text-yellow-600"
+                                >
+                                  Editar
+                                </button>
+
+                                <button
+                                  onClick={() => handleEliminar(respuesta._id)}
+                                  className="text-red-600"
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
 
                               {respuestasActivas[respuesta._id] && (
-                                <CrearCommitForm titulo={pub.titulo} parentCommitId={respuesta._id} />
+                                <CrearCommitForm
+                                  titulo={pub.titulo}
+                                  parentCommitId={respuesta._id}
+                                  onCancel={() => setRespuestasActivas((prev) => ({
+                                    ...prev,
+                                    [respuesta._id]: false,
+                                  }))}
+                                />
                               )}
                             </li>
                           ))}

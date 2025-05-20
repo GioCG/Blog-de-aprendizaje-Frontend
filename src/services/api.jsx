@@ -55,6 +55,47 @@ export const createCommit = async (data) => {
     return { error: true, message: error.response?.data?.message || "Error al crear commit" };
   }
 };
+export const deleteCommit = async (id) => {
+  const token = JSON.parse(localStorage.getItem("user"))?.token;
+
+  try {
+    const response = await apiClient.delete(`/commits/${id}`, {
+      headers: {
+        'x-token': token,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    return {
+      error: true,
+      message: error.response?.data?.msg || "Error al eliminar el commit",
+    };
+  }
+};
+
+
+export const editCommit = async (id, textoprincipal) => {
+  const token = JSON.parse(localStorage.getItem("user"))?.token;
+
+  try {
+    const response = await apiClient.put(`/commits/${id}`, 
+      { textoprincipal },
+      {
+        headers: {
+          'x-token': token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    return {
+      error: true,
+      message: error.response?.data?.msg || "Error al editar el commit",
+    };
+  }
+};
+
+
 
 export const getCommitsByUsername = async (username) => {
     try {

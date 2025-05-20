@@ -6,16 +6,20 @@ export const useCreateCommit = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [commitData, setCommitData] = useState(null);
 
-  const submitCommit = async ({ textoprincipal, username, titulo = null, parentCommitId = null }) => {
+  const submitCommit = async ({
+    textoprincipal,
+    username,
+    titulo = null,
+    parentCommitId = null,
+  }) => {
     setIsLoading(true);
     try {
       const payload = {
         textoprincipal,
-        username,
+        username: username || "Anónimo",
         titulo,
-        parentCommitId, 
+        parentCommitId,
       };
-
 
       const result = await createCommit(payload);
 
